@@ -1,4 +1,5 @@
 use std::{
+    fs,
     io::{prelude::*, BufReader},
     net::{TcpListener, TcpStream},
 };
@@ -25,6 +26,12 @@ fn handle_connection(mut stream: TcpStream) {
     // BufReader implements the std::io::BufRead trait, which provides the lines method. 
     // The lines method returns an iterator of Result<String, std::io::Error>
     
-    let response = "HTTP/1.1 200 OK\r\n\r\n"; // empty body
+    let status_line = "HTTP/1.1 200 OK";
+    // let contents = fs::read_to_string("hello.html").unwrap();
+    let contents = String::from("<!DOCTYPE html><head><title>Hello!</title></head>Hi from Rust</html>");
+    let length = contents.len();
+
+    let response =
+        format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
     stream.write_all(response.as_bytes()).unwrap();
 }
