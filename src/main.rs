@@ -3,16 +3,19 @@ use std::{
     io::{prelude::*, BufReader},
     net::{TcpListener, TcpStream},
 };
+use api::ThreadPool;
 
 fn main() {
     //  listen for TCP connections at the address 127.0.0.1:7878
     let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
     // Listening for incoming streams and printing a message when we receive a stream.
+
+    let pool = ThreadPool::new(4);
     for stream in listener.incoming() {
         let stream = stream.unwrap(); // streams of type TcpStream
 
-        // println!("Connection established!");
-        handle_connection(stream);
+        pool.execute(|| handle_connection(stream));
+        // handle_connection(stream);
     }
 }
 
