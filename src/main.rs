@@ -26,11 +26,13 @@ fn handle_connection(mut stream: TcpStream) {
     // BufReader implements the std::io::BufRead trait, which provides the lines method. 
     // The lines method returns an iterator of Result<String, std::io::Error>
     
-    let status_line = "HTTP/1.1 200 OK";
-    // let contents = fs::read_to_string("hello.html").unwrap();
-    let contents = String::from("<!DOCTYPE html><head><title>Hello!</title></head>Hi from Rust</html>");
+    let (status_line, contents) = if http_request[0] == "GET / HTTP/1.1" {
+        ("HTTP/1.1 200 OK",  String::from("<!DOCTYPE html><head><title>Hello!</title></head>Hi from Rust</html>"))
+    } else {
+        ("HTTP/1.1 404 NOT FOUND", String::from("<!DOCTYPE html><head><title>Hello!</title></head><h1>Oops!</h1>
+        <p>Sorry, I don't know what you're asking for.</p></html>"))
+    };
     let length = contents.len();
-
     let response =
         format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
     stream.write_all(response.as_bytes()).unwrap();
